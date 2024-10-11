@@ -1,0 +1,114 @@
+#Build:
+-Expo
+-React Native Elements
+-React Navigation
+-React Native Maps
+-Redux Toolkit
+-Tailwind CSS
+-Google APIs:
+1.Direction API
+2. Distance Matrix
+3. Places API
+
+----
+expo init ride-wave
+blank
+cd ride-wave
+npm expo start --tunnel
+
+----
+npm install @reduxjs/toolkit
+npm install react-redux
+npm install @react-navigation/native @react-navigation/stack
+npm install react-native-screens react-native-safe-area-context
+npm install react-native-elements
+npm install react-native-vector-icons
+npm install react-native-safe-area-context
+
+https://github.com/FaridSafi/react-native-google-places-autocomplete
+https://www.npmjs.com/package/react-native-dotenv
+https://www.npmjs.com/package/react-native-maps
+https://www.npmjs.com/package/react-native-maps-directions
+
+--Google API:
+1. Google Places Autocomplete
+  npm install react-native-google-places-autocomplete
+2. Directions API
+3. Distance Matrix
+4.
+
+----
+KeyboardAvoidingView:
+App.js:
+<KeyboardAvoidingView
+  behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+  style={{ flex: 1 }}
+  keyboardVerticalOffset={Platform.OS === 'ios' ? -64 : 0}
+>   
+  <Stack.Navigator></Stack.Navigator>
+</KeyboardAvoidingView>
+  It uses padding for iOS and height for Android
+
+---
+Internalization JavaScript API
+Allows you to format a text using natural js Api
+
+----
+npm i tailwind-react-native-classnames
+
+import tw from 'tailwind-react-native-classnames';
+
+tw`pt-6 bg-blue-100`;
+// -> { paddingTop: 24, backgroundColor: 'rgba(219, 234, 254, 1)' }
+
+In the spirit of Tailwindcss's intuitive responsive prefix syntax, tailwind-react-native-classnames adds support for platform prefixes to conditionally apply styles based on the current platform:
+
+// 😎 styles only added if platform matches
+tw`ios:pt-4 android:pt-2`;
+You can also use tw.style() for handling more complex class name declarations. The api for this function is directly taken from the excellent classnames package.
+
+// pass multiple args
+tw.style('text-sm', 'bg-blue-100', 'flex-row mb-2');
+
+// arrays of classnames work too
+tw.style(['text-sm', 'bg-blue-100']);
+
+// falsy stuff is ignored, so you can do conditionals like this
+tw.style(isOpen && 'bg-blue-100');
+
+// { [className]: boolean } style - key class only added if value is `true`
+tw.style({
+  'bg-blue-100': isActive,
+  'text-red-500': invalid,
+});
+
+import { StyleSheet, Text, View, SafeAreaView } from "react-native";
+import React from "react";
+import tw from "tailwind-react-native-classnames";
+
+const HomeScreen = () => {
+  return (
+    <SafeAreaView>
+      <Text style={tw`text-red-500 p-10`}>HomeScreen Tailwind CSS</Text>
+      <Text style={[tw`text-blue-500 p-10`, styles.text]}>
+        Tailwind combined with normal Functional CSS
+      </Text>
+      <Text style={[tw`text-blue-500 p-10`, {color: "green"}]}>
+        Tailwind combined with Inline Functional CSS
+      </Text>
+    </SafeAreaView>
+  );
+};
+
+export default HomeScreen;
+
+const styles = StyleSheet.create({
+    text: {
+        fontSize: 17
+    }
+});
+
+
+-----
+
+
