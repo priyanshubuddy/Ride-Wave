@@ -2,6 +2,16 @@
   "version": "2.0.0",
   "tasks": [
     {
+      "label": "Set IP Address",
+      "type": "shell",
+      "command": "cmd",
+      "args": [
+        "/c",
+        "start.bat"
+      ],
+      "problemMatcher": []
+    },
+    {
       "label": "Start Frontend",
       "type": "shell",
       "command": "npm start",
@@ -18,6 +28,19 @@
         "cwd": "${workspaceFolder}/Backend"
       },
       "problemMatcher": []
+    },
+    {
+      "label": "Start App",
+      "dependsOn": [
+        "Set IP Address",
+        "Start Frontend",
+        "Start Backend"
+      ],
+      "problemMatcher": [],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
     }
   ]
 }

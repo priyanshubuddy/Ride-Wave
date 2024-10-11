@@ -1,13 +1,14 @@
-   @echo off
+@echo off
+setlocal
 
-   REM Get the IPv4 address using PowerShell
-   for /f "tokens=*" %%i in ('powershell -command "((Get-NetIPAddress -AddressFamily IPv4).IPAddress)[0]"') do set IP=%%i
+REM Get the IPv4 address
+for /f "tokens=14" %%i in ('ipconfig ^| findstr /r /c:"IPv4 Address"') do set IP=%%i
 
-   REM Output the IP address to config.js
-   echo module.exports = { IP_ADDRESS: "%IP%" }; > Frontend\config.js
+REM Remove any carriage return characters
+set IP=%IP:~0,-1%
 
-   REM Open a new Command Prompt window and run the frontend
-   start cmd /k "cd Frontend && npm start"
+REM Output the IP address to config.js
+echo module.exports = { IP_ADDRESS: "%IP%" }; > Frontend/config.js
 
-   REM Open another new Command Prompt window and run the backend
-   start cmd /k "cd Backend && npm run dev"
+REM Close the terminal
+exit
