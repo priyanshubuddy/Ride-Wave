@@ -1,0 +1,10 @@
+{
+  "name": "ride-wave",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "start start.bat && concurrently \"npm start --prefix Frontend\" \"npm run dev --prefix Backend\""
+  },
+  "devDependencies": {
+    "concurrently": "^8.0.0"
+  }
+}

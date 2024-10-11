@@ -1,8 +1,8 @@
 import axios from 'axios';
+import { IP_ADDRESS } from '../config';
 
-const devUrl = 'http://192.168.220.22:3000';
+const devUrl = `http://${IP_ADDRESS.trim()}:3000`;
 const prodUrl = 'https://api.productionurl.com';
-
 
 console.log(devUrl);
 const axiosInstance = axios.create({
