@@ -10,6 +10,7 @@ import MapScreen from './screen/MapScreen';
 import ConfirmationScreen from './screen/ConfirmationScreen';
 import LoginScreen from './screen/Login';
 import SignUpScreen from './screen/SignUp';
+import LandingScreen from './screen/Landing';
 
 export default function App() {
 
@@ -26,7 +27,14 @@ export default function App() {
             style={{ flex: 1 }}
             keyboardVerticalOffset={Platform.OS === 'ios' ? -64 : 0}
           > 
-            <Stack.Navigator initialRouteName="LoginScreen">
+            <Stack.Navigator initialRouteName="LandingScreen">
+            <Stack.Screen
+                name='LandingScreen'
+                component={LandingScreen}
+                options={{
+                  headerShown: false,
+                }}
+              />
               <Stack.Screen
                 name='LoginScreen'
                 component={LoginScreen}
