@@ -87,17 +87,51 @@ export default function Map() {
     return travelTime;
   };
 
+  const getRegionForCoordinates = (points) => {
+    let minX, maxX, minY, maxY;
+
+    // init first point
+    ((point) => {
+      minX = point.latitude;
+      maxX = point.latitude;
+      minY = point.longitude;
+      maxY = point.longitude;
+    })(points[0]);
+
+    // calculate rect
+    points.map((point) => {
+      minX = Math.min(minX, point.latitude);
+      maxX = Math.max(maxX, point.latitude);
+      minY = Math.min(minY, point.longitude);
+      maxY = Math.max(maxY, point.longitude);
+    });
+
+    const midX = (minX + maxX) / 2;
+    const midY = (minY + maxY) / 2;
+    const deltaX = (maxX - minX);
+    const deltaY = (maxY - minY);
+
+    return {
+      latitude: midX,
+      longitude: midY,
+      latitudeDelta: deltaX,
+      longitudeDelta: deltaY
+    };
+  };
+
+  const initialRegion = origin && destination ? getRegionForCoordinates([origin.location, destination.location]) : {
+    latitude: origin ? origin.location.lat : 0,
+    longitude: origin ? origin.location.lng : 0,
+    latitudeDelta: 0.005,
+    longitudeDelta: 0.005,
+  };
+
   return (
     <MapView
       ref={mapRef}
       style={tw`flex-1`}
       mapType="mutedStandard"
-      initialRegion={{
-        latitude: origin ? origin.location.lat : 0,
-        longitude: origin ? origin.location.lng : 0,
-        latitudeDelta: 0.005,
-        longitudeDelta: 0.005,
-      }}
+      initialRegion={initialRegion}
     >
       {origin && destination && (
         <MapViewDirections
