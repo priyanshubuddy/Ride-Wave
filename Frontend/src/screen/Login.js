@@ -1,42 +1,43 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, SafeAreaView, Image } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, SafeAreaView, Image, ActivityIndicator } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import axiosInstance from '../utils/axiosInstance';
-import tw from 'tailwind-react-native-classnames';
 import { LinearGradient } from 'expo-linear-gradient';
+import { storeAuthData } from '../utils/auth';
 
-const LoginScreen = () => {
-  const navigation = useNavigation();
-  const route = useRoute();
-  const { authType } = route.params || { authType: 'user' };
+const LoginScreen = ({ navigation, route }) => {
+  const { authType = 'user' } = route.params || {};
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleLogin = async () => {
+    if (!email || !password) {
+      Alert.alert('Error', 'Please fill in all fields');
+      return;
+    }
+
+    setLoading(true);
     try {
-      const endpoint = authType === 'user' ? '/api/users/login' : '/api/drivers/login';
-      const response = await axiosInstance.post(endpoint, {
-        email,
+      const response = await axiosInstance.post('/api/users/login', {
+        email: email.toLowerCase(),
         password,
-        authType,
       });
-      const { status, message, error } = response.data;
-      if (status === 200) {
-        Alert.alert('Success', message || 'Login successful', [
-          { text: 'OK', onPress: () => navigation.navigate('HomeScreen') }
-        ]);
-      } else if (status === 400) {
-        Alert.alert('Error', error);
-      } else {
-        Alert.alert('Error', 'Failed to login');
+
+      const { token, userData } = response.data;
+      
+      if (token && userData) {
+        await storeAuthData(token, userData);
+        if (route.params?.handleAuthStateChange) {
+          route.params.handleAuthStateChange(true);
+        }
       }
     } catch (error) {
-      console.error('Error: ', error);
-      if (error.response && error.response.data && error.response.data.error) {
-        Alert.alert('Error', error.response.data.error);
-      } else {
-        Alert.alert('Error', 'Error logging in');
-      }
+      console.error('Login error:', error);
+      const errorMessage = error.response?.data?.error || 'Login failed';
+      Alert.alert('Error', errorMessage);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -47,7 +48,7 @@ const LoginScreen = () => {
         style={styles.gradient}
       >
         <Image
-          source={authType === 'user' ? require('../assets/icon.png') : require('../assets/driver-bg.png')}
+          source={authType === 'user' ? require('../../assets/icon.png') : require('../../assets/driver-bg.png')}
           style={styles.logo}
           resizeMode="contain"
         />
@@ -83,6 +84,9 @@ const LoginScreen = () => {
             Don't have an account? Sign Up
           </Text>
         </TouchableOpacity>
+        {loading && (
+          <ActivityIndicator size={36} color="#ffffff" />
+        )}
       </LinearGradient>
     </SafeAreaView>
   );

@@ -8,11 +8,17 @@ exports.registerDriver = async (req, res) => {
 
         const existingDriver = await Driver.findOne({ email });
         if (existingDriver) {
-            return res.status(400).json({ error: 'Driver with this email already exists' });
+            return res.status(400).json({ 
+                status: 400,
+                error: 'Driver with this email already exists' 
+            });
         }
 
         if (!name || !vehicleDetails || !licenseNumber || !email || !password) {
-            return res.status(400).json({ error: 'All fields are required' });
+            return res.status(400).json({ 
+                status: 400,
+                error: 'All fields are required' 
+            });
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
@@ -27,21 +33,30 @@ exports.registerDriver = async (req, res) => {
 
         await driver.save();
 
-        const token = jwt.sign({ driverId: driver._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+        const token = jwt.sign({ driverId: driver._id }, process.env.JWT_SECRET, { expiresIn: '24h' });
+
+        // Prepare driver data without sensitive information
+        const userData = {
+            id: driver._id,
+            name: driver.name,
+            email: driver.email,
+            vehicleDetails: driver.vehicleDetails,
+            licenseNumber: driver.licenseNumber,
+            type: 'driver'
+        };
 
         res.status(201).json({
             status: 201,
             message: 'Driver registered successfully',
-            driver: {
-                id: driver._id,
-                name: driver.name,
-                email: driver.email
-            },
-            token
+            token,
+            userData
         });
     } catch (error) {
         console.error('Error registering driver:', error);
-        res.status(500).json({ status: 500, error: 'Error registering driver' });
+        res.status(500).json({ 
+            status: 500, 
+            error: 'Error registering driver' 
+        });
     }
 };
 
@@ -51,19 +66,44 @@ exports.loginDriver = async (req, res) => {
         const driver = await Driver.findOne({ email });
         
         if (!driver) {
-            return res.status(401).json({ error: 'Invalid email or password' });
+            return res.status(401).json({ 
+                status: 401,
+                error: 'Invalid email or password' 
+            });
         }
 
-        const isPasswordValid = await bcrypt.compare(password, driver.password);
+        const isPasswordValid = await bcrypt.hash(password, driver.password);
         
         if (!isPasswordValid) {
-            return res.status(401).json({ error: 'Invalid email or password' });
+            return res.status(401).json({ 
+                status: 401,
+                error: 'Invalid email or password' 
+            });
         }
 
-        const token = jwt.sign({ driverId: driver._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+        const token = jwt.sign({ driverId: driver._id }, process.env.JWT_SECRET, { expiresIn: '24h' });
         
-        res.status(200).json({ message: 'Login successful', token, driver: { id: driver._id, name: driver.name, email: driver.email } });
+        // Prepare driver data without sensitive information
+        const userData = {
+            id: driver._id,
+            name: driver.name,
+            email: driver.email,
+            vehicleDetails: driver.vehicleDetails,
+            licenseNumber: driver.licenseNumber,
+            type: 'driver'
+        };
+
+        res.status(200).json({ 
+            status: 200,
+            message: 'Login successful',
+            token,
+            userData
+        });
     } catch (error) {
-        res.status(500).json({ error: 'Error logging in driver' });
+        console.error('Error logging in driver:', error);
+        res.status(500).json({ 
+            status: 500,
+            error: 'Error logging in driver' 
+        });
     }
 };

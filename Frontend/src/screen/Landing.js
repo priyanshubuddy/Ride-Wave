@@ -19,7 +19,7 @@ const LandingScreen = () => {
         style={styles.gradient}
       >
         <Image
-          source={authType === 'user' ? require('../assets/icon.png') : require('../assets/driver-bg.png')}
+          source={authType === 'user' ? require('../../assets/icon.png') : require('../../assets/driver-bg.png')}
           style={styles.logo}
           resizeMode="contain"
         />

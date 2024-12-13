@@ -1,10 +1,10 @@
 import React from "react";
 import { Text, View, FlatList, TouchableOpacity, Image, ToastAndroid } from "react-native";
-import { Icon } from "react-native-elements/dist/icons/Icon";
+import { Icon } from "react-native-elements";
 import tw from "tailwind-react-native-classnames";
 import { useNavigation } from "@react-navigation/native";
 import { useSelector } from "react-redux";
-import { selectOrigin } from "../src/redux/slices/navSlice";
+import { selectOrigin } from "../redux/slices/navSlice";
 
 const data = [
   {
@@ -28,36 +28,41 @@ const NavOptions = () => {
   const origin = useSelector(selectOrigin);
 
   const handlePress = (item) => {
+    if (!origin?.location) {
+      ToastAndroid.show("Please select a pickup location", ToastAndroid.SHORT);
+      return;
+    }
+    
     if (item.title === "Order Food") {
       ToastAndroid.show("Order Food is coming soon", ToastAndroid.SHORT);
-    } else {
-      navigation.navigate(item.screen);
+      return;
     }
+    
+    navigation.navigate(item.screen);
   };
 
   return (
     <FlatList
       data={data}
-      horizontal={true}
+      horizontal
       keyExtractor={(item) => item.id}
-      contentContainerStyle={{ paddingHorizontal: 10, justifyContent: 'space-between', width: '100%' }}
+      contentContainerStyle={tw`justify-evenly w-full`}
       renderItem={({ item }) => (
         <TouchableOpacity
           onPress={() => handlePress(item)}
           style={[
-            tw`p-1 pl-4 pb-6 pt-3 bg-gray-200 m-2`,
-            { width: 140, height: 280 },
+            tw`p-4 bg-gray-100 m-2 rounded-lg shadow-md`,
+            { height: 300 },
           ]}
-          disabled={!origin}
         >
-          <View style={tw`${!origin && "opacity-20"}`}>
+          <View style={tw`${!origin && "opacity-50"}`}>
             <Image
-              style={{ width: 120, height: 120, resizeMode: "contain" }}
+              style={{ width: 130, height: 130, resizeMode: "contain", borderRadius: 10 }}
               source={{ uri: item.image }}
             />
-            <Text style={tw`mt-2 text-lg font-semibold`}>{item.title}</Text>
+            <Text style={tw`mt-3 text-xl font-bold text-center`}>{item.title}</Text>
             <Icon
-              style={tw`p-2 bg-black rounded-full w-10 mt-4`}
+              style={tw`p-3 bg-black rounded-full w-12 mt-5 self-center`}
               name="arrowright"
               type="antdesign"
               color="white"

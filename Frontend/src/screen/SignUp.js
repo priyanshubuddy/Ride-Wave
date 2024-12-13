@@ -1,15 +1,12 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, SafeAreaView, Alert } from 'react-native';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, SafeAreaView, Alert, ActivityIndicator } from 'react-native';
 import axiosInstance from '../utils/axiosInstance';
-import tw from 'tailwind-react-native-classnames';
 import { LinearGradient } from 'expo-linear-gradient';
 import DropDownPicker from 'react-native-dropdown-picker';
+import { storeAuthData } from '../utils/auth';
 
-const SignUpScreen = () => {
-  const navigation = useNavigation();
-  const route = useRoute();
-  const { authType } = route.params || { authType: 'user' };
+const SignUpScreen = ({ navigation, route }) => {
+  const { authType = 'user', handleAuthStateChange } = route.params || {};
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -24,32 +21,52 @@ const SignUpScreen = () => {
     { label: 'Auto Rickshaw', value: 'Auto Rickshaw' },
     { label: 'Motorcycle', value: 'Motorcycle' },
   ]);
+  const [loading, setLoading] = useState(false);
 
   const handleSignUp = async () => {
+    if (!name || !email || !password) {
+      Alert.alert('Error', 'Please fill in all required fields');
+      return;
+    }
+
+    if (authType === 'driver' && (!vehicleDetails || !licenseNumber)) {
+      Alert.alert('Error', 'Please fill in all driver-specific details');
+      return;
+    }
+
     try {
+      setLoading(true);
       const endpoint = authType === 'user' ? '/api/users/register' : '/api/drivers/register';
       const payload = authType === 'user' 
-        ? { name, email, password }
-        : { name, email, password, vehicleDetails, licenseNumber };
+        ? { name, email: email.toLowerCase(), password }
+        : { 
+            name, 
+            email: email.toLowerCase(), 
+            password, 
+            vehicleDetails, 
+            licenseNumber 
+          };
       
       const response = await axiosInstance.post(endpoint, payload);
-      const { status, message, error } = response.data;
-      if (status === 201) {
-        Alert.alert('Success', message, [
-          { text: 'OK', onPress: () => navigation.navigate('HomeScreen') }
-        ]);
-      } else if (status === 400) {
-        Alert.alert('Error', error);
+      
+      if (response.data?.token && response.data?.userData) {
+        await storeAuthData(response.data.token, response.data.userData);
+        if (handleAuthStateChange) {
+          handleAuthStateChange(true);
+        }
       } else {
-        Alert.alert('Error', 'Failed to register');
+        Alert.alert('Success', 'Registration successful! Please login.');
+        navigation.navigate('LoginScreen', { 
+          authType,
+          handleAuthStateChange 
+        });
       }
     } catch (error) {
       console.error('Error: ', error);
-      if (error.response && error.response.data && error.response.data.error) {
-        Alert.alert('Error', error.response.data.error);
-      } else {
-        Alert.alert('Error', 'Error registering');
-      }
+      const errorMessage = error.response?.data?.error || 'Error registering. Please try again.';
+      Alert.alert('Error', errorMessage);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -60,7 +77,7 @@ const SignUpScreen = () => {
         style={styles.gradient}
       >
         <Image
-          source={authType === 'user' ? require('../assets/icon.png') : require('../assets/driver-bg.png')}
+          source={authType === 'user' ? require('../../assets/icon.png') : require('../../assets/driver-bg.png')}
           style={styles.logo}
           resizeMode="contain"
         />
@@ -121,16 +138,31 @@ const SignUpScreen = () => {
           )}
         </View>
         <TouchableOpacity
-          style={styles.signUpButton}
+          style={[
+            styles.signUpButton,
+            loading && styles.disabledButton
+          ]}
           onPress={handleSignUp}
+          disabled={loading}
         >
-          <Text style={styles.signUpButtonText}>Sign Up</Text>
+          <Text style={styles.signUpButtonText}>
+            {loading ? 'Signing Up...' : 'Sign Up'}
+          </Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate('LoginScreen', { authType })}>
+        <TouchableOpacity 
+          onPress={() => navigation.navigate('LoginScreen', { 
+            authType,
+            handleAuthStateChange 
+          })}
+          disabled={loading}
+        >
           <Text style={styles.loginText}>
             Already have an account? Login
           </Text>
         </TouchableOpacity>
+        {loading && (
+          <ActivityIndicator size={36} color="#ffffff" />
+        )}
       </LinearGradient>
     </SafeAreaView>
   );
@@ -217,6 +249,9 @@ const styles = StyleSheet.create({
   loginText: {
     color: '#fff',
     fontSize: 16,
+  },
+  disabledButton: {
+    opacity: 0.7,
   },
 });
 
