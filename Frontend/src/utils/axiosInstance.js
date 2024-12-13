@@ -4,7 +4,7 @@ import { getAuthData } from './auth';
 
 const devUrl = `http://${IP_ADDRESS.trim()}:3000`;
 const prodUrl = 'https://ride-wave-backend-13ra.onrender.com';
-const mode = 'development';
+const mode = 'production';
 
 const axiosInstance = axios.create({
   baseURL: mode === 'development' ? devUrl : prodUrl,
