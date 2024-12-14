@@ -72,7 +72,7 @@ const NavFavorites = ({ onSelect }) => {
 
         if (existingTypeIndex !== -1) {
             // Replace existing location of same type
-            newFavorites = favorites.map((fav, index) => 
+            newFavorites = favorites.map((fav, index) =>
                 index === existingTypeIndex ? newLocation : fav
             );
         } else {
@@ -105,72 +105,70 @@ const NavFavorites = ({ onSelect }) => {
 
     return (
         <View style={tw`bg-white flex-shrink`}>
-            <ScrollView style={tw`max-h-96`}>
-                <FlatList
-                    data={favorites}
-                    keyExtractor={(item) => item.id}
-                    scrollEnabled={false}
-                    ItemSeparatorComponent={() => (
-                        <View style={[tw`bg-gray-200`, { height: 0.5 }]} />
-                    )}
-                    renderItem={({ item }) => (
-                        <TouchableOpacity 
-                            style={tw`flex-row items-center p-5`}
-                            onPress={() => onSelect?.(item)}
-                            onLongPress={() => handleRemoveLocation(item.id)}
-                        >
-                            <Icon
-                                style={tw`mr-4 rounded-full bg-gray-300 p-3`}
-                                name={item.icon}
-                                type="ionicon"
-                                color="white"
-                                size={18}
-                            />
-                            <View style={tw`flex-1`}>
-                                <Text style={tw`font-semibold text-lg`}>{item.location}</Text>
-                                <Text 
-                                    style={tw`text-gray-500`}
-                                    numberOfLines={1}
-                                    ellipsizeMode="tail"
-                                >
-                                    {item.description}
-                                </Text>
-                            </View>
-                        </TouchableOpacity>
-                    )}
-                    ListEmptyComponent={() => (
-                        <View style={tw`py-4`}>
-                            <Text style={tw`text-center text-gray-500`}>
-                                No favorite locations added yet
+            <FlatList
+                data={favorites}
+                keyExtractor={(item) => item.id}
+                scrollEnabled={false}
+                ItemSeparatorComponent={() => (
+                    <View style={[tw`bg-gray-200`, { height: 0.5 }]} />
+                )}
+                renderItem={({ item }) => (
+                    <TouchableOpacity
+                        style={tw`flex-row items-center p-5`}
+                        onPress={() => onSelect?.(item)}
+                        onLongPress={() => handleRemoveLocation(item.id)}
+                    >
+                        <Icon
+                            style={tw`mr-4 rounded-full bg-gray-300 p-3`}
+                            name={item.icon}
+                            type="ionicon"
+                            color="white"
+                            size={18}
+                        />
+                        <View style={tw`flex-1`}>
+                            <Text style={tw`font-semibold text-lg`}>{item.location}</Text>
+                            <Text
+                                style={tw`text-gray-500`}
+                                numberOfLines={1}
+                                ellipsizeMode="tail"
+                            >
+                                {item.description}
                             </Text>
                         </View>
-                    )}
-                    ListFooterComponent={() => (
-                        favorites.length < MAX_FAVORITES && (
-                            <View style={tw`px-5 pb-4`}>
-                                {locationTypes.map((type) => (
-                                    !favorites.find(fav => fav.location === type.label) && (
-                                        <TouchableOpacity
-                                            key={type.id}
-                                            style={tw`flex-row items-center justify-center p-3 bg-gray-100 rounded-lg mb-2`}
-                                            onPress={() => handleAddLocation(type)}
-                                        >
-                                            <Icon
-                                                name={type.icon}
-                                                type="ionicon"
-                                                size={20}
-                                                color="#4b5563"
-                                                style={tw`mr-2`}
-                                            />
-                                            <Text style={tw`text-gray-600`}>Add {type.label}</Text>
-                                        </TouchableOpacity>
-                                    )
-                                ))}
-                            </View>
-                        )
-                    )}
-                />
-            </ScrollView>
+                    </TouchableOpacity>
+                )}
+                ListEmptyComponent={() => (
+                    <View style={tw`py-4`}>
+                        <Text style={tw`text-center text-gray-500`}>
+                            No favorite locations added yet
+                        </Text>
+                    </View>
+                )}
+                ListFooterComponent={() => (
+                    favorites.length < MAX_FAVORITES && (
+                        <View style={tw`px-5 pb-4`}>
+                            {locationTypes.map((type) => (
+                                !favorites.find(fav => fav.location === type.label) && (
+                                    <TouchableOpacity
+                                        key={type.id}
+                                        style={tw`flex-row items-center justify-center p-3 bg-gray-100 rounded-lg mb-2`}
+                                        onPress={() => handleAddLocation(type)}
+                                    >
+                                        <Icon
+                                            name={type.icon}
+                                            type="ionicon"
+                                            size={20}
+                                            color="#4b5563"
+                                            style={tw`mr-2`}
+                                        />
+                                        <Text style={tw`text-gray-600`}>Add {type.label}</Text>
+                                    </TouchableOpacity>
+                                )
+                            ))}
+                        </View>
+                    )
+                )}
+            />
 
             <Modal
                 visible={showAddModal}
