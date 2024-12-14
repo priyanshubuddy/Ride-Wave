@@ -24,6 +24,30 @@
       }
     },
     {
+      "label": "Install Frontend Dependencies",
+      "type": "shell",
+      "command": "npm install",
+      "options": {
+        "cwd": "${workspaceFolder}/Frontend"
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "close": true
+      }
+    },
+    {
+      "label": "Install Backend Dependencies",
+      "type": "shell",
+      "command": "npm install",
+      "options": {
+        "cwd": "${workspaceFolder}/Backend"
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "close": true
+      }
+    },
+    {
       "label": "Start Frontend",
       "type": "shell",
       "command": "npm start",
@@ -52,6 +76,8 @@
       "dependsOn": [
         "Pull from Main",
         "Set IP Address",
+        "Install Frontend Dependencies",
+        "Install Backend Dependencies",
         "Start Frontend",
         "Start Backend"
       ],
